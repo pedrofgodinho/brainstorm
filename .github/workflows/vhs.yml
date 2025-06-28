@@ -22,10 +22,14 @@ jobs:
       - name: Add binary to path
         run: echo "${{ github.workspace }}/target/release" >> $GITHUB_PATH
 
-      - name: build gif
-        uses: charmbracelet/vhs-action@v1
-        with:
-          path: 'example/demo.tape'
+      - name: Setup Go
+        uses: actions/setup-go@v5.5.0
+      - name: Generate the gif with vhs
+        run: |
+          sudo apt update
+          sudo apt install -y ffmpeg ttyd
+          go install github.com/charmbracelet/vhs@latest
+          vhs examples/demo.tape
 
       - uses: stefanzweifel/git-auto-commit-action@v4
         env:
@@ -36,4 +40,4 @@ jobs:
           commit_user_name: vhs-action 📼
           commit_user_email: actions@github.com
           commit_author: vhs-action 📼 <actions@github.com>
-          file_pattern: 'example/demo.gif'
+          file_pattern: 'examples/demo.gif'
