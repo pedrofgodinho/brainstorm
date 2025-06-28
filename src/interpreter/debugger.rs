@@ -56,7 +56,7 @@ impl<T: Read> Debugger<T> {
                 _ => {
                     println!("Unknown command: {l}");
                     false
-                },
+                }
             } {
                 self.context();
             }
@@ -88,7 +88,7 @@ impl<T: Read> Debugger<T> {
         println!("{}", self.interpreter.dump_program().0);
         false
     }
-    
+
     fn tape(&self) -> bool {
         self.interpreter.print_tape();
         false
@@ -136,7 +136,8 @@ impl<T: Read> Debugger<T> {
 
     fn breakpoint(&mut self, l: &str) -> bool {
         if let Some(s) = l.split_whitespace().nth(1)
-          && let Ok(v) = usize::from_str_radix(s.trim_start_matches("0x"), 16) {
+            && let Ok(v) = usize::from_str_radix(s.trim_start_matches("0x"), 16)
+        {
             println!("Added breakpoint at {v:#x}");
             self.interpreter.add_breakpoint(v);
         } else {
@@ -147,7 +148,8 @@ impl<T: Read> Debugger<T> {
 
     fn clear(&mut self, l: &str) -> bool {
         if let Some(s) = l.split_whitespace().nth(1)
-            && let Ok(v) = usize::from_str_radix(s.trim_start_matches("0x"), 16) {
+            && let Ok(v) = usize::from_str_radix(s.trim_start_matches("0x"), 16)
+        {
             if self.interpreter.clear_breakpoint(v) {
                 println!("Cleared breakpoint at {v:#x}");
             } else {

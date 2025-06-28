@@ -88,7 +88,7 @@ impl Program {
             let line = line.trim();
             if let Some(line) = line.strip_prefix(";") {
                 Self::push_token(&mut tokens, &mut next_token);
-                
+
                 if units.is_empty() && !tokens.is_empty() {
                     units.push(Unit {
                         description: "No Unit Name".to_string(),
@@ -115,7 +115,8 @@ impl Program {
 
                         match next_token {
                             Some(Token::Increment(value)) => {
-                                next_token = Some(Token::Increment(value.wrapping_add(initial_value)));
+                                next_token =
+                                    Some(Token::Increment(value.wrapping_add(initial_value)));
                             }
                             _ => {
                                 Self::push_token(&mut tokens, &mut next_token);

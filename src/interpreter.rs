@@ -1,13 +1,13 @@
 pub mod debugger;
 
-use std::collections::HashSet;
 use crate::parser::{Program, Token};
 use clap::ValueEnum;
 use owo_colors::{OwoColorize, Style};
+use std::collections::HashSet;
 use std::fmt::Display;
+use std::fmt::Write;
 use std::io::{Read, Write as _};
 use thiserror::Error;
-use std::fmt::Write;
 
 #[derive(Error, Debug)]
 pub enum InterpreterError {
@@ -104,13 +104,18 @@ impl<R: Read> Interpreter<R> {
             } else {
                 print!("{char} ");
             }
-
         }
 
         println!();
     }
 
-    fn dump_program_range(&self, unit_name: &str, start: usize, end: usize, indentation: &mut usize) -> (String, Option<usize>) {
+    fn dump_program_range(
+        &self,
+        unit_name: &str,
+        start: usize,
+        end: usize,
+        indentation: &mut usize,
+    ) -> (String, Option<usize>) {
         // This entire function is beyond ugly, as I just kept expanding it to add more features rather than refactoring
         // I might fix it at some point.
         let mut output = String::new();
@@ -121,7 +126,13 @@ impl<R: Read> Interpreter<R> {
 
         // The write! macro might return an error, but writing to a String cannot fail,
         // so .unwrap() is safe to use here.
-        write!(output, "{:#0width$x}  {}", start.yellow(), unit_name.yellow()).unwrap();
+        write!(
+            output,
+            "{:#0width$x}  {}",
+            start.yellow(),
+            unit_name.yellow()
+        )
+        .unwrap();
 
         let mut next_on_new_line = true;
         let mut tokens_since_new_line = 0;
@@ -140,7 +151,12 @@ impl<R: Read> Interpreter<R> {
             }
 
             if next_on_new_line || tokens_since_new_line >= 5 {
-                write!(output, "\n{:#0width$x}    {EMPTY: <indentation$}", i.dimmed()).unwrap();
+                write!(
+                    output,
+                    "\n{:#0width$x}    {EMPTY: <indentation$}",
+                    i.dimmed()
+                )
+                .unwrap();
                 next_on_new_line = false;
                 tokens_since_new_line = 0;
             }
@@ -158,12 +174,12 @@ impl<R: Read> Interpreter<R> {
             match token {
                 Token::JumpNotZero(t) => {
                     next_on_new_line = true;
-                    write!(output, " {} {:#x}", "->".dimmed(), (t-1).dimmed()).unwrap();
+                    write!(output, " {} {:#x}", "->".dimmed(), (t - 1).dimmed()).unwrap();
                 }
                 Token::JumpZero(t) => {
                     *indentation += 2;
                     next_on_new_line = true;
-                    write!(output, " {} {:#x}", "->".dimmed(), (t-1).dimmed()).unwrap();
+                    write!(output, " {} {:#x}", "->".dimmed(), (t - 1).dimmed()).unwrap();
                 }
                 _ => (),
             }
@@ -185,7 +201,8 @@ impl<R: Read> Interpreter<R> {
         let mut line_count = 0;
         let mut indentation = 0;
         for unit in &self.program.units {
-            let unit_dump = self.dump_program_range(&unit.description, unit.start, unit.end, &mut indentation);
+            let unit_dump =
+                self.dump_program_range(&unit.description, unit.start, unit.end, &mut indentation);
             result.push_str(&unit_dump.0);
             if let Some(line) = unit_dump.1 {
                 green_line = line_count + line;
@@ -199,7 +216,12 @@ impl<R: Read> Interpreter<R> {
     pub fn dump_current_program_section(&self, before: usize, after: usize) {
         let dump = self.dump_program();
         println!("Printing {} to {} around {}", before, after, dump.1);
-        for line in dump.0.lines().skip(dump.1.saturating_sub(before)).take(before + 1 + after) {
+        for line in dump
+            .0
+            .lines()
+            .skip(dump.1.saturating_sub(before))
+            .take(before + 1 + after)
+        {
             println!("{line}");
         }
     }
@@ -246,7 +268,11 @@ impl<R: Read> Interpreter<R> {
         println!("{}", "Registers:".blue().bold());
         println!("{}: {:#0x}", "PC".yellow(), self.pc);
         println!("{}: {:#0x}", "TP".yellow(), self.ptr);
-        println!("{}: {}", "Current Unit".yellow(), self.program.units[self.current_unit].description);
+        println!(
+            "{}: {}",
+            "Current Unit".yellow(),
+            self.program.units[self.current_unit].description
+        );
 
         println!(
             "{}", "=========================================== END CTX ===========================================".red()
@@ -285,7 +311,7 @@ impl<R: Read> Interpreter<R> {
             Token::Output => {
                 print!("{}", self.tape[self.ptr] as char);
                 std::io::stdout().flush().unwrap();
-            },
+            }
             Token::Input => {
                 let mut buffer = [0u8; 1];
                 let mut bytes = self.input.read(&mut buffer);
@@ -307,7 +333,10 @@ impl<R: Read> Interpreter<R> {
         }
         self.pc += 1;
 
-        while !(self.program.units[self.current_unit].start..self.program.units[self.current_unit].end).contains(&self.pc) {
+        while !(self.program.units[self.current_unit].start
+            ..self.program.units[self.current_unit].end)
+            .contains(&self.pc)
+        {
             self.current_unit += 1;
             self.current_unit %= self.program.units.len();
         }
