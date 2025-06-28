@@ -2,6 +2,11 @@
 on:
   push:
     branches: [ "main" ]
+    paths:
+      - 'src/**'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+      - 'examples/**.tape'
 jobs:
   vhs:
     runs-on: ubuntu-latest
