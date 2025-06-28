@@ -1,4 +1,4 @@
-﻿# Brainstorm
+﻿# 🧠⚡ Brainstorm
 
 Brainstorm is a brainfuck interpreter and debugger written in rust 🦀.
 
