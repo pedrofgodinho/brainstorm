@@ -1,0 +1,39 @@
+﻿name: vhs
+on:
+  push:
+    branches: [ "main" ]
+jobs:
+  vhs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          override: true
+
+      - name: Build binary in release mode
+        run: cargo build --release
+
+      - name: Add binary to path
+        run: echo "${{ github.workspace }}/target/release" >> $GITHUB_PATH
+
+      - name: build gif
+        uses: charmbracelet/vhs-action@v1
+        with:
+          path: 'example/demo.tape'
+
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          commit_message: Update generated VHS GIF
+          branch: main
+          commit_user_name: vhs-action 📼
+          commit_user_email: actions@github.com
+          commit_author: vhs-action 📼 <actions@github.com>
+          file_pattern: 'example/demo.gif'

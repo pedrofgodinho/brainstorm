@@ -1,0 +1,10 @@
+[package]
+name = "brainstorm"
+version = "0.1.0"
+edition = "2024"
+description = "Brainstorm is a brainfuck interpreter and debugger written in rust 🦀"
+
+[dependencies]
+clap = { version = "4.5.40", features = ["derive"] }
+owo-colors = "4.2.2"
+thiserror = "2.0.12"
